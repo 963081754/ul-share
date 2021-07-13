@@ -1,0 +1,104 @@
+html,body,
+body > #app,
+body > #app > .admin,
+body > #app > .home{
+    height: 100%;
+    width: 100%;
+    max-height: 100%;
+    max-width: 100%;
+    background:#fff;
+    overflow: hidden;
+}
+body{
+    /* font-family: Avenir, Helvetica, Arial, sans-serif; */
+    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale
+}
+*{
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+    
+    font-size: 13px;
+    color: #333;
+}
+
+// i.fa{
+//     position: relative;
+//     > label.handle{
+//         display: block;
+//         width: .4em;
+//         height: .2em;
+//         background: #000;
+//         border-radius: 2px;
+
+//         position: absolute;
+//         top: 80%;
+//         left: 87%;
+//         transform: rotate(35deg);
+//     }
+// }
+// i.fa{
+//     position: relative;
+//     i.fa{
+//         position: absolute;
+//         font-size: .5em;
+//         top: 0px;
+//         left: 0px;
+//     }
+// }
+
+.popup{
+    height: calc(100% - 40px); // 留点空隙吧
+    // &.reportPopup{
+    //     height: auto;
+    // }
+}
+
+.tof{
+    text-overflow: ellipsis;
+    white-space: nowrap;   
+}
+.toff{
+    text-overflow: ellipsis;
+    white-space: nowrap;   
+    overflow: hidden;
+}
+
+
+@keyframes colorFlash {
+    10%, 90% { 
+        color: #000;
+    }
+    30%, 70% { 
+       color: #fff;
+    }
+    50% { 
+        color: #000;
+    }
+}
+
+@keyframes shake { /* 水平抖动，核心代码 */
+    10%, 90% { 
+        box-shadow: 1px 1px 30px 0px #ccc;
+        transform: translate3d(-2px, -2px, 0); 
+    }
+    20%, 80% {
+        box-shadow: 1px 1px 0px 0px #ccc;
+         transform: translate3d(+2px, +2px, 0); 
+    }
+    30%, 70% { 
+        box-shadow: 1px 1px 30px 0px #ccc;
+        transform: translate3d(-2px, -2px, 0); 
+    }
+    40%, 60% {
+        box-shadow: 1px 1px 0px 0px #ccc;
+         transform: translate3d(+2px, +2px, 0); 
+    }
+    50% { 
+        box-shadow: 1px 1px 30px 0px #ccc;
+        transform: translate3d(-2px, -2px, 0); 
+    }
+}

@@ -1,0 +1,789 @@
+/*
+文件说明：
+一套 原生HTML控件的外观优化。
+为了区别于其它组件，我们的每个element都加上一个attribute：raw。如：
+<input raw />,<select raw>……</select>等等。
+*/
+:root{
+  // --border-color: #c5c5d5;
+  // --border-color: #d5d5f5;
+  // --thead-color: #f0e0f0;
+
+  --border-color: #a5a5c5;
+  --thead-color: #f0e0f0;
+  
+  --table-t-shadow: 1px 1px 0px 0px var(--border-color),-1px -1px 0px 0px var(--border-color);
+  --table-b-shadow: 0px -1px 0px 0px var(--border-color),0px 2px 0px 0px var(--border-color);
+  --table-l-shadow: 1px 0px 0px 0px var(--border-color),-1px 0px 0px 0px var(--border-color);
+  --table-r-shadow: 1px 0px 0px 0px var(--border-color),-1px 0px 0px 0px var(--border-color);
+}
+
+*{
+  box-sizing: border-box;
+}
+
+.optimize{
+  user-select:none;
+  -ms-user-select:none;
+  pointer-events: none;
+}
+.optimize2{
+  user-select:none !important;
+  -ms-user-select:none !important;
+}
+
+@keyframes appear
+{
+from {opacity: 0;}
+to {opacity: 1;}
+}
+
+.childs-none-events:not(tbody) > * > *{
+  pointer-events: none; 
+} // 辅助 v-sort，提升性能、效率：item targt里的元素 都禁止事件，这样拖拉的所有event的target就只有item元素。event.target就=item元素。IE11以下不支持pointer-events
+tbody.childs-none-events > tr > td > *{
+  pointer-events: none; 
+} // 辅助 v-sort
+
+.r-select,
+.r-datepicker{
+  padding: 0px 5px;
+  border:none;
+  outline:none;
+  border-radius: 2px;
+  border: 1px solid #bbb;  
+  box-sizing: border-box;
+  width: auto;
+  vertical-align: middle;
+}
+// -->unagainButton
+button.unagainButton{
+  position: relative;
+  &.lock::before{
+    content: ' ';
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+  }
+  &.lock::after{
+    content: "\f110";
+    font: normal normal normal 14px/1 FontAwesome;
+    text-rendering: auto;
+    color: #000;
+    position: absolute !important;
+    top: calc(50% - 6px) !important;
+    left: calc(50% - 6px) !important;
+    animation: fa-spin 2s infinite linear;
+
+    border: none !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    background:none !important;
+  }
+}
+// <--unagainButton
+
+// --->r-message 消息提示
+.r-message:not(.confirm){
+  display:inline-block;
+  opacity:0;
+  position:fixed;
+  z-index:1000000000000000;
+  top:0px;
+  left:0px;
+  padding:10px 20px 10px 10px;
+  background:#fef0f0;
+  border:1px solid #ddd;
+  border-radius:2px;
+  box-shadow: 0px 1px 10px 0px #432;
+  transition:opacity 300ms,top 200ms;
+  > i.fa:not(.close){
+    display: inline-block;
+    // padding: 5px;
+    font-size: 1.1em;
+    margin-right: 5px;
+    // vertical-align: top;
+    + span{
+      display: inline-block;
+    }
+  }
+  > i.fa.close{
+    position: absolute;
+    right: -1px;
+    top: -17px;
+    cursor: pointer;
+    padding: 2px 7px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-radius: 2px;
+    // box-shadow: 0px -5px 5px 0px #aaa;
+  }
+  &.error{
+    background: #fefefe;
+    > i.fa:not(.close){
+      color: #0c0;
+    }
+  }
+  &.success{
+    background: #fee;
+    > i.fa:not(.close){
+      color: #f33;
+    }
+  }
+  &.info{
+    // background: #efefff;
+    > i.fa:not(.close){
+      color: #00f;
+    }
+  }
+}
+.r-message.confirm{
+  display:inline-block;
+  opacity:0;
+  position:fixed;
+  z-index:100000;
+  top:0px;
+  left:0px;
+  
+  transition:opacity 300ms,top 200ms;
+  > div:nth-child(2){
+    position: relative;
+    z-index: 2;
+    padding:10px 20px 10px 10px;
+    background:#fef0f0;
+    border:1px solid #ddd;
+    border-radius:2px;
+    box-shadow:0px 2px 10px 1px #336;
+    > div.title{
+      > i.fa:not(.close){
+        font-size: 1.2em;
+        margin-right: 5px;
+        + span{
+          display: inline-block;
+        }
+      }
+    }
+    > div.value{
+      padding: 5px 0px;
+    }
+    > div.buttons{
+      padding-top: 10px;
+      text-align: right;
+      > button:first-child{
+        margin-right: 10px;
+      }
+    }
+  }
+  > div.shade{
+    position: fixed;
+    z-index: 1;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    background: #fff;
+    opacity: 0;
+    &:active + div{
+      animation: shake 100ms linear;
+    }
+  }
+}
+// <---r-message
+
+// --> r-select
+.r-select{
+  display: inline-block;
+  position: relative;
+  padding: 0px;
+  // height: 100%;
+  height: 25px;
+  > .input{
+    min-width: 40px;
+    min-height: 20px;
+    > label{
+      opacity: .5;
+    }
+  }
+  > input,> input[raw][readonly],
+  > .input,> .input[raw][readonly]{
+    height: 100%;
+    width: 100%;
+    max-width: 100%;
+    padding-right: 11px;
+    cursor: default;
+    border: none;
+    outline:none;
+    background: none;
+    text-align: inherit;
+    line-height: 25px;
+  }
+  > ul.dropdown{
+      position: fixed;
+      z-index: 100000;
+      display: none;
+      background: #fff;
+      border-top: 1px solid #ddd;
+      box-shadow: 0px 3px 4px 0px #777;
+
+      max-height: calc(100% - 5px);
+      overflow: auto;
+      > li{
+        position: relative;
+        z-index: 0;
+      }
+      > li.header{
+        z-index: 10;
+        position: sticky;
+        top: 0px;
+        background:#fff;
+        border-bottom: 1px solid #cba;
+        &:empty{
+          display: none !important;
+        }
+      }
+  }
+  ul{
+    text-align: left;
+    li{
+      display: block !important;
+      float: none !important;
+      min-height: 25px !important;
+      height: auto !important;
+    }
+    li > div{
+        display: block;
+        padding: 0px 5px;
+        line-height: 25px;
+        cursor: pointer;  
+        // border-bottom: 1px solid #eee;
+        // position: relative;
+        // z-index: 0;
+    }
+    // li:nth-child(even) > div{
+    //     background: #f5f5fd; 
+    // }
+    li:not([disabled]):not([optgroup]):not(.header):not([selected]) > div:hover{
+        background: #654;
+        color: #fff;
+        & *,& *::placeholder{
+          color: #fff;
+        }
+    }
+    li[disabled] > div{
+        cursor: default;
+        color: #888;
+    }
+    li[optgroup] > div{
+      cursor: default;
+    }
+    li[selected] > div{
+        background: #432;
+        color: #fff;
+        & *,& *::placeholder{
+          color: #fff;
+        }
+        position: relative;
+    }
+    li[selected] > div::after{
+        content: "✓";
+        margin-left: 4px;
+        position: absolute;
+        right: 2px;
+        top: 0;
+    }
+    li li div{
+      padding-left: 1em;
+    }
+    li li li div{
+      padding-left: 2em;
+    }
+    li li li li div{
+      padding-left: 3em;
+    }
+    li li li li li div{
+      padding-left: 4em;
+    }
+  }
+  ul.dropdown.parentSelectable{
+    li[optgroup] > div{
+      cursor: pointer;
+    }
+  }
+  ul.dropdown.dropdownShowed{
+      display: block;
+  }
+  > i.clear{
+      display: none;
+      position: absolute;
+      right: 1px;
+      top: calc(50% - 8px);
+      // font-size: 1.1em;
+      cursor: pointer;
+  }
+  > i.dirIcon{
+    position: absolute;
+    top: calc(50% - 6px);
+    right: 1px;
+    pointer-events: none;
+  }
+  > input:hover + i.clear,
+  > .input:hover + i.clear,
+  > i.clear:hover{
+      display: block;
+      + .dirIcon{
+        display: none;
+      }
+  }
+
+  &.loading{
+    > span.loading{
+      // display: block;
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      // background:#999;
+      text-align: center;
+      > i.fa{
+        vertical-align: middle;
+      }
+    }
+  }
+}
+// <-- r-select
+
+// --> r-datePicker
+.r-datepicker{
+  display: inline-block;
+  height: 25px;  
+  min-width: 90px;   
+  border-bottom: 1px solid #ddd;
+  > *{
+    display: inline-block;
+  }
+  > input{
+      border:none;
+      outline:none;
+      align-self: center;
+      width: calc(100% - 18px);
+      height: 100%;
+      background:none;
+  }
+  > .fa{
+      min-width: 16px;
+      // display: block;
+      font-size: .7em;
+      text-align: left;
+      align-self: center;
+      opacity: .3;
+  }
+}
+
+.r-datePicker-panel{    
+  animation: appear 300ms;
+  background: #fff;
+  border: 1px solid #aaa;  
+  display: inline-block;
+  position: relative;    
+  > *{
+      display: inline-block;
+      vertical-align: top;
+      // border: 1px solid #000;
+  }
+  > .details{
+      padding: 10px;
+      width: 260px;
+      > ul.weeks{
+          li{
+              float: left;
+              width: 14.28%;
+              height: 25px;
+              line-height: 25px;
+              text-align: center;
+              color: #999;
+              // border: 1px solid #00f;
+          }
+          li[txt="日"],li[txt="六"]{
+              color: #d94;
+          }
+      }
+      > ul.dates,> ul.years,> ul.months{
+          li{
+              float: left;
+              width: 14.28%;
+              height: 25px;
+              line-height: 25px;
+              text-align: center;
+              color: #000;
+              cursor: pointer;
+          }
+          li[value_date],
+          li[value_month],
+          li[value_year],
+          li[current_date]{
+                  background: #66f;
+                  border-radius: 3px;
+                  font-size: 1.1em;
+                  color: #fff !important;
+          }
+          li[current_date]{
+              background: #aaa;
+              font-weight: bold;
+              color: #000 !important;
+          }
+      }
+      > ul.dates{
+          li{
+              color:#999
+          }
+          li[value-month]{
+              color: #000;
+          }
+          li:nth-child(7n-6)[value-month],li:nth-child(7n-7)[value-month]{
+              color: #f00;
+          }            
+      }
+      > ul.years{
+          li{
+              float: left;
+              width: 20%;
+              height: 40px;
+              line-height: 40px;
+              text-align: center;
+              color: #000;
+          }
+      }
+      > ul.months{
+          li{
+              float: left;
+              width: 25%;
+              height: 50px;
+              line-height: 50px;
+              text-align: center;
+              color: #000;
+          }
+      }
+      > ul.weeks::after,> ul.dates::after{
+          content: " ";
+          display: block;
+          clear: both;
+      }
+      > .ymd{
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 5px 7px;
+          > .ym{
+              height: 25px;
+              width: 110px;
+              text-align: center;
+              line-height: 22px;
+              box-shadow: 0px 0px 1px 0px #ccc;
+              border: 1px solid #afafaf;
+              border-radius: 3px;
+              padding-right: 10px;
+              cursor: pointer;
+              position: relative;
+              color: #000;
+              label{
+                  cursor: pointer;
+              }
+          }
+          > .ym:hover{
+              background: #eee;
+          }
+          > .ym::after{
+              content: "\f107";
+              font: normal normal normal 14px/1 FontAwesome;
+              position: absolute;
+              right: 5px;
+              top: .4em;
+          }
+          > .left,> .right{
+              i.fa{
+                  width: 18px;
+                  height: 22px;
+                  line-height: 22px;
+                  text-align: center;
+                  cursor: pointer;
+                  // border: 1px solid #00f;
+              }
+              i.fa:hover{
+                  font-weight: bold;
+              }
+          }
+      }
+  }
+  > .details.hasOptions{
+      border-right: 1px solid #aaa;
+  }
+  > ul.options{
+      border-left: 1px solid #aaa;
+      position: relative;
+      left: -1px;
+      li{
+          cursor: pointer;
+          padding: 3px 8px;
+      }
+  }
+  > ul.options:empty{
+      display: none;
+  }
+}
+.r-datePicker-panel.fixed{
+  position: fixed;
+  z-index: 100000;
+  top: 50px;
+  left: 50px;
+  box-shadow: 0px 0px 4px 0px #999;
+}
+.r-datePicker-panel.hide{
+  display: none;
+}
+
+.r-datePicker-panel.top{
+  margin-top: 11px;
+}
+.r-datePicker-panel.bottom{
+  margin-bottom: 11px;
+}
+.r-datePicker-panel.top::after,.r-datePicker-panel.top::before,
+.r-datePicker-panel.bottom::after,.r-datePicker-panel.bottom::before{
+  content: '';
+  display: block;
+  position: absolute;
+  z-index: 1;
+  top: -20px;
+  left: 10px;
+  width: 0px;
+  height: 0;
+  border: 10px solid;
+  border-color: transparent transparent #fff transparent;
+}
+.r-datePicker-panel.top::after,
+.r-datePicker-panel.bottom::after{
+  z-index: 0;
+  top: -22px;
+  left: 9px;
+  border: 11px solid;
+  border-color: transparent transparent #777 transparent;
+}
+
+.r-datePicker-panel.bottom::after,.r-datePicker-panel.bottom::before{
+  top: auto;
+  bottom: -20px;
+  border-color: #fff transparent transparent transparent;
+}
+.r-datePicker-panel.bottom::after{
+  top: auto;
+  bottom: -22px;
+  border-color: #777 transparent transparent transparent;
+}
+
+.r-datePicker-panel.left::after,.r-datePicker-panel.left::before{
+  right: auto;
+  left: 10px;
+}
+.r-datePicker-panel.left::after{
+  right: auto;
+  left: 9px;
+}
+
+.r-datePicker-panel.right::after,.r-datePicker-panel.right::before{
+  left: auto;
+  right: 10px;
+}
+.r-datePicker-panel.right::after{
+  left: auto;
+  right: 9px;
+}
+// <-- r-datePicker
+
+// --> 自定义 title 美化
+[hint2]{
+  position: relative;  
+}
+[hint2].hover::after,
+[hint2]:hover::after,
+[hint3]:hover::before,
+[hint].hover::after,
+[hint]:hover::after{  
+  pointer-events: none;
+  display: inline-block;  
+  white-space:nowrap; 
+  padding: 2px 5px;
+  border: 1px solid #669;
+  border-radius: 2px;
+  z-index: 100;
+
+  font-size: 12px;
+  font-weight: 500 !important;
+  text-align: left !important;
+  line-height: 1.5em;
+  color: #444;
+  background: #fff;
+  box-shadow: 0px 1px 8px 0px #aaa;
+  text-shadow: none;
+}
+
+[hint].hover::after,
+[hint]:hover::after,
+[hint3]:hover::before {
+  content: attr(hint);
+  position: fixed;
+  margin-top: -30px;
+  // margin-left: -5px;
+}
+[hint].hover::after,
+[hint]:hover::after{
+  margin-left: -30px;
+}
+[hint3]:hover::before{
+  content: attr(hint3);
+}
+[hint][hintb].hover::after,
+[hint][hintb]:hover::after {
+  margin-top: 20px;
+}
+[hint][hintl]:hover::after {
+  margin-top: 20px;
+}
+[hint2].hover::after,
+[hint2]:hover::after {
+  content: attr(hint2);
+  position: absolute;
+  bottom: 80%;
+  left: 60%;
+}
+[hint2][hint2l]:hover::after{
+  left:auto;
+  right: 60%;
+}
+[hint2][hint2l2]:hover::after{
+  left:auto;
+  right: 0;
+}
+[hint2][hint2t]:hover::after{
+  top: -30px;
+  bottom: auto;
+  left:0px;
+  right:auto;
+}
+[hint2][hint2b]:hover::after{
+  bottom: -30px;
+  top: auto;
+}
+[hintt50]:hover::after,[hintt50].hover::after{margin-top: -50px;}
+
+[hintl0]:hover::after,[hintl50].hover::after{margin-left: 0px;}
+[hintl50]:hover::after,[hintl50].hover::after{margin-left: -50px;}
+[hintl70]:hover::after,[hintl70].hover::after{margin-left: -70px;}
+[hintl90]:hover::after,[hintl90].hover::after{margin-left: -90px;}
+[hintl140]:hover::after,[hintl140].hover::after{margin-left: -140px;}
+
+[hint].h80:hover::after,[hint3].h80:hover::before{white-space:normal;width: 80px;}
+[hint].h100:hover::after,[hint3].h100:hover::before{white-space:normal;width: 100px;}
+[hint].h110:hover::after,[hint3].h110:hover::before{white-space:normal;width: 110px;}
+[hint].h120:hover::after,[hint3].h120:hover::before{white-space:normal;width: 120px;}
+[hint].h130:hover::after,[hint3].h130:hover::before{white-space:normal;width: 130px;}
+[hint].h140:hover::after,[hint3].h140:hover::before{white-space:normal;width: 140px;}
+[hint].h160:hover::after,[hint3].h160:hover::before{white-space:normal;width: 160px;}
+[hint].h180:hover::after,[hint3].h180:hover::before{white-space:normal;width: 180px;}
+[hint].h200:hover::after,[hint3].h200:hover::before{white-space:normal;width: 200px;}
+[hint].h220:hover::after,[hint3].h220:hover::before{white-space:normal;width: 220px;}
+[hint].h240:hover::after,[hint3].h240:hover::before{white-space:normal;width: 240px;}
+[hint].h260:hover::after,[hint3].h260:hover::before{white-space:normal;width: 260px;}
+[hint].h280:hover::after,[hint3].h280:hover::before{white-space:normal;width: 280px;}
+[hint].h300:hover::after,[hint3].h300:hover::before{white-space:normal;width: 300px;}
+[hint].h320:hover::after,[hint3].h320:hover::before{white-space:normal;width: 320px;}
+[hint].h340:hover::after,[hint3].h340:hover::before{white-space:normal;width: 340px;}
+[hint].h360:hover::after,[hint3].h360:hover::before{white-space:normal;width: 360px;}
+[hint].h380:hover::after,[hint3].h380:hover::before{white-space:normal;width: 380px;}
+[hint].h400:hover::after,[hint3].h400:hover::before{white-space:normal;width: 400px;}
+[hint].h420:hover::after,[hint3].h420:hover::before{white-space:normal;width: 420px;}
+// <--
+
+// --> v-resize
+.resize-stick{
+  display: block;
+  position:absolute;
+  // z-index: 111;
+  background-color: #000;
+  opacity: 0;
+}
+.resize-stick{
+  height: 3px;
+  width: 100%;
+  top: 0px;
+  left: 0px;
+  right: auto;
+  bottom: auto;
+  cursor:n-resize;
+}
+.resize-stick2{
+  height: 100%;
+  width: 3px;
+  top: 0px;
+  left: auto;
+  right: 0px;
+  bottom: auto;
+  cursor:e-resize;
+}
+.resize-stick3{
+  height: 3px;
+  width: 100%;
+  top: auto;
+  left: 0px;
+  right: auto;
+  bottom: 0px;
+  cursor:n-resize;
+}
+.resize-stick4{
+  height: 100%;
+  width: 3px;
+  top: 0px;
+  left: 0px;
+  right: auto;
+  bottom: auto;
+  cursor:e-resize;
+}
+
+.resize-angle-stick{
+  display: block;
+  position:absolute;
+  z-index: 112;  
+  height: 6px;
+  width: 6px;
+  background: #f00;
+  opacity: 0;
+
+  top: 0px;
+  left: 0px;
+  cursor:se-resize;
+}
+.resize-angle-stick2{
+  top: 0px;
+  left: auto;
+  right: 0px;
+  bottom: auto;
+  cursor:ne-resize;
+}
+.resize-angle-stick3{
+  top: auto;
+  left: auto;
+  right: 0px;
+  bottom: 0px;
+  cursor:se-resize;
+}
+.resize-angle-stick4{
+  top: auto;
+  left: 0px;
+  right: auto; // unset不兼容IE
+  bottom: 0px;
+  cursor:ne-resize;
+}
+// <-- v-resize
