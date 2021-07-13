@@ -8,7 +8,7 @@
 Uilibrary是组件，direcives是指令，utility是组件、指令用到的工具函数，
 
 ### 组件：
-* 多列select(http://www.zuobaobiao.cn/#a41)
+* [多列select](http://www.zuobaobiao.cn/#a41)
 * 提交时等待button
 * 颜色选择器colorPicker
 * 日期输入框datePicker
